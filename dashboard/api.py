@@ -78,7 +78,7 @@ class DashboardAPI:
             ]
 
         @app.get("/api/reports/latest")
-        def get_latest_report(report_type: str = Query("daily", regex="^(daily|weekly|monthly)$")):
+        def get_latest_report(report_type: str = Query("daily", pattern="^(daily|weekly|monthly)$")):
             report = self.db.get_latest_report(report_type)
             if not report:
                 raise HTTPException(status_code=404, detail="No report found")
@@ -96,7 +96,7 @@ class DashboardAPI:
             }
 
         @app.get("/api/reports/history")
-        def get_report_history(report_type: str = Query("daily", regex="^(daily|weekly|monthly)$"), limit: int = Query(30, ge=1, le=365)):
+        def get_report_history(report_type: str = Query("daily", pattern="^(daily|weekly|monthly)$"), limit: int = Query(30, ge=1, le=365)):
             since = datetime.utcnow() - timedelta(days=limit)
             reports = self.db.get_reports_since(since, report_type=report_type)
             return [

@@ -257,6 +257,21 @@ class TechIntelAgent:
         api.create_app()
         api.run(host=host, port=port)
 
+    def run_serve(self, host: str = "0.0.0.0", port: int = 8000):
+        import threading
+        from dashboard.api import DashboardAPI
+
+        api = DashboardAPI(self.db, self.config)
+        api.create_app()
+
+        def start_dashboard():
+            api.run(host=host, port=port)
+
+        t = threading.Thread(target=start_dashboard, daemon=True)
+        t.start()
+
+        self.run_scheduled()
+
 
 def main():
     import argparse
@@ -265,7 +280,8 @@ def main():
     parser.add_argument("--config", "-c", help="Path to config.yaml", default=None)
     parser.add_argument("--run-once", "-r", action="store_true", help="Run collection once and exit")
     parser.add_argument("--daemon", "-d", action="store_true", help="Run as scheduled daemon")
-    parser.add_argument("--dashboard", action="store_true", help="Start dashboard API")
+    parser.add_argument("--dashboard", action="store_true", help="Start dashboard API only")
+    parser.add_argument("--serve", "-s", action="store_true", help="Run daemon + dashboard together")
     parser.add_argument("--host", default="0.0.0.0", help="Dashboard host")
     parser.add_argument("--port", type=int, default=8000, help="Dashboard port")
 
@@ -277,6 +293,8 @@ def main():
         agent.run_once()
     elif args.dashboard:
         agent.run_dashboard(host=args.host, port=args.port)
+    elif args.serve:
+        agent.run_serve(host=args.host, port=args.port)
     else:
         agent.run_scheduled()
 
