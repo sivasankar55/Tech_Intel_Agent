@@ -1,0 +1,142 @@
+# Daily AI & Tech Intelligence Agent Configuration
+
+# Schedule
+schedule:
+  time: "08:00"          # 24-hour format
+  timezone: "UTC"
+
+# Twitter / X accounts to monitor
+twitter:
+  accounts:
+    - "OpenAI"
+    - "AnthropicAI"
+    - "PerplexityAI"
+    - "cursor_ai"
+    - "vercel"
+    - "lovable_dev"
+    - "bolt"
+    - "LangChainAI"
+    - "huggingface"
+    - "ycombinator"
+    - "aidotcom"
+    - "techstars"
+    - "sama"
+    - "karpathy"
+  max_posts_per_account: 20
+
+# GitHub monitoring
+github:
+  trending:
+    since: "daily"        # daily, weekly, monthly
+    language: "python"
+  topics:
+    - "ai"
+    - "artificial-intelligence"
+    - "large-language-models"
+    - "agents"
+    - "mcp"
+    - "developer-tools"
+    - "machine-learning"
+    - "deep-learning"
+    - "generative-ai"
+  max_repos_per_topic: 10
+
+# Product Hunt monitoring
+producthunt:
+  topics:
+    - "artificial-intelligence"
+    - "developer-tools"
+    - "productivity"
+    - "open-source"
+  max_products: 20
+
+# Hacker News monitoring
+hackernews:
+  topics:
+    - "ai"
+    - "startup"
+    - "engineering"
+    - "technology"
+  max_stories: 30
+
+# News / Blog sources
+news:
+  sources:
+    - name: "OpenAI Blog"
+      type: "rss"
+      url: "https://openai.com/blog/feed.xml"
+    - name: "Anthropic Blog"
+      type: "rss"
+      url: "https://www.anthropic.com/feed.xml"
+    - name: "Google AI Blog"
+      type: "rss"
+      url: "https://feeds.feedburner.com/blogspot/gJZg"
+    - name: "TechCrunch AI"
+      type: "rss"
+      url: "https://techcrunch.com/category/artificial-intelligence/feed/"
+  max_articles: 20
+
+# Engagement scoring weights
+engagement:
+  weights:
+    likes: 1.0
+    replies: 3.0
+    retweets: 2.0
+    quotes: 4.0
+    stars: 1.0
+    votes: 2.0
+    score: 1.0
+  min_score: 10
+
+# Content filtering
+filtering:
+  min_text_length: 50
+  exclude_keywords:
+    - "spam"
+    - "click here"
+  categories:
+    - "AI News"
+    - "AI Tools"
+    - "Startup News"
+    - "Open Source Projects"
+    - "Coding Tools"
+    - "Agent Frameworks"
+    - "Automation Platforms"
+    - "Research"
+
+# AI Analysis
+ai_analysis:
+  enabled: true
+  model: "gemini-2.0-flash"
+  max_tokens: 4096
+
+# Reporting
+reporting:
+  max_top_posts: 10
+  max_trending_repos: 10
+  max_tools: 10
+  include_executive_summary: true
+  include_top_posts: true
+  include_ai_news: true
+  include_tools: true
+  include_repos: true
+  include_trends: true
+  include_opportunities: true
+  include_takeaways: true
+
+# Delivery
+delivery:
+  telegram:
+    enabled: true
+    chunk_size: 4000
+  email:
+    enabled: true
+
+# Storage
+storage:
+  database: "sqlite:///data/tech_intel.db"
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/agent.log"

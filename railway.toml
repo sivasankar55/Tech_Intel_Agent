@@ -1,0 +1,11 @@
+[build]
+  builder = "nixpacks"
+  buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+  startCommand = "bash start.sh"
+
+[volumes]
+  data = "/app/data"
+  exports = "/app/exports"
+  logs = "/app/logs"
