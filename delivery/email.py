@@ -55,10 +55,15 @@ class EmailDeliverer:
 
             msg.attach(MIMEText(html_body, "html"))
 
-            with smtplib.SMTP(self.host, self.port) as server:
-                server.starttls()
-                server.login(self.user, self.password)
-                server.send_message(msg)
+            if self.port == 465:
+                with smtplib.SMTP_SSL(self.host, self.port) as server:
+                    server.login(self.user, self.password)
+                    server.send_message(msg)
+            else:
+                with smtplib.SMTP(self.host, self.port) as server:
+                    server.starttls()
+                    server.login(self.user, self.password)
+                    server.send_message(msg)
 
             self.logger.info(f"Email sent to {self.to_addr}")
             return True
