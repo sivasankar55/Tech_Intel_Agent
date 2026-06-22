@@ -258,19 +258,33 @@ class TechIntelAgent:
         api.run(host=host, port=port)
 
     def run_serve(self, host: str = "0.0.0.0", port: int = 8000):
-        import threading
         from dashboard.api import DashboardAPI
+
+        self.scheduler = BackgroundScheduler()
+        schedule = self.config.schedule
+        hour, minute = map(int, schedule.time.split(":"))
+
+        self.scheduler.add_job(
+            self.run_once,
+            CronTrigger(hour=hour, minute=minute, timezone=schedule.timezone),
+            id="daily_intel",
+        )
+        self.scheduler.add_job(
+            self.check_weekly_report,
+            CronTrigger(hour=hour, minute=minute + 5, day_of_week="mon", timezone=schedule.timezone),
+            id="weekly_report",
+        )
+        self.scheduler.add_job(
+            self.check_monthly_report,
+            CronTrigger(hour=hour, minute=minute + 10, day=1, timezone=schedule.timezone),
+            id="monthly_report",
+        )
+        self.scheduler.start()
+        self.logger.info(f"Scheduler started. Next daily run at {schedule.time} {schedule.timezone}")
 
         api = DashboardAPI(self.db, self.config)
         api.create_app()
-
-        def start_dashboard():
-            api.run(host=host, port=port)
-
-        t = threading.Thread(target=start_dashboard, daemon=True)
-        t.start()
-
-        self.run_scheduled()
+        api.run(host=host, port=port)
 
 
 def main():
