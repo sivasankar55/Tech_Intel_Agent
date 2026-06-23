@@ -184,10 +184,10 @@ class TechIntelAgent:
         self.logger.info(f"Deliveries: {delivery_results}")
 
     def check_weekly_report(self):
-        if datetime.now(timezone.utc).weekday() != 0:
+        if datetime.utcnow().weekday() != 0:
             return
         self.logger.info("Generating weekly report...")
-        since = datetime.now(timezone.utc) - timedelta(days=7)
+        since = datetime.utcnow() - timedelta(days=7)
         daily_reports = self.db.get_reports_since(since, report_type="daily")
         if daily_reports:
             report_data = self.report_gen.generate_weekly(
@@ -200,10 +200,10 @@ class TechIntelAgent:
                 self.email.send(subject=report_data["title"], html_content=report_data.get("html_content", ""))
 
     def check_monthly_report(self):
-        if datetime.now(timezone.utc).day != 1:
+        if datetime.utcnow().day != 1:
             return
         self.logger.info("Generating monthly report...")
-        since = datetime.now(timezone.utc) - timedelta(days=30)
+        since = datetime.utcnow() - timedelta(days=30)
         daily_reports = self.db.get_reports_since(since, report_type="daily")
         if daily_reports:
             report_data = self.report_gen.generate_monthly(
@@ -258,33 +258,19 @@ class TechIntelAgent:
         api.run(host=host, port=port)
 
     def run_serve(self, host: str = "0.0.0.0", port: int = 8000):
+        import threading
         from dashboard.api import DashboardAPI
-
-        self.scheduler = BackgroundScheduler()
-        schedule = self.config.schedule
-        hour, minute = map(int, schedule.time.split(":"))
-
-        self.scheduler.add_job(
-            self.run_once,
-            CronTrigger(hour=hour, minute=minute, timezone=schedule.timezone),
-            id="daily_intel",
-        )
-        self.scheduler.add_job(
-            self.check_weekly_report,
-            CronTrigger(hour=hour, minute=minute + 5, day_of_week="mon", timezone=schedule.timezone),
-            id="weekly_report",
-        )
-        self.scheduler.add_job(
-            self.check_monthly_report,
-            CronTrigger(hour=hour, minute=minute + 10, day=1, timezone=schedule.timezone),
-            id="monthly_report",
-        )
-        self.scheduler.start()
-        self.logger.info(f"Scheduler started. Next daily run at {schedule.time} {schedule.timezone}")
 
         api = DashboardAPI(self.db, self.config)
         api.create_app()
-        api.run(host=host, port=port)
+
+        def start_dashboard():
+            api.run(host=host, port=port)
+
+        t = threading.Thread(target=start_dashboard, daemon=True)
+        t.start()
+
+        self.run_scheduled()
 
 
 def main():

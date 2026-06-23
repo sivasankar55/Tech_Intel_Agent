@@ -8,5 +8,6 @@ mkdir -p data exports logs
 # Run initial collection on startup
 python main.py --run-once
 
-# Run daemon + dashboard in a single process (avoids SQLite locking)
-python main.py --serve --port "${PORT:-8080}"
+# Run both daemon (24h scheduler) and dashboard API
+python main.py --daemon &
+python main.py --dashboard --port "${PORT:-8080}"
