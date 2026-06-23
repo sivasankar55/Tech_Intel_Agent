@@ -184,10 +184,10 @@ class TechIntelAgent:
         self.logger.info(f"Deliveries: {delivery_results}")
 
     def check_weekly_report(self):
-        if datetime.utcnow().weekday() != 0:
+        if datetime.now(timezone.utc).weekday() != 0:
             return
         self.logger.info("Generating weekly report...")
-        since = datetime.utcnow() - timedelta(days=7)
+        since = datetime.now(timezone.utc) - timedelta(days=7)
         daily_reports = self.db.get_reports_since(since, report_type="daily")
         if daily_reports:
             report_data = self.report_gen.generate_weekly(
@@ -200,10 +200,10 @@ class TechIntelAgent:
                 self.email.send(subject=report_data["title"], html_content=report_data.get("html_content", ""))
 
     def check_monthly_report(self):
-        if datetime.utcnow().day != 1:
+        if datetime.now(timezone.utc).day != 1:
             return
         self.logger.info("Generating monthly report...")
-        since = datetime.utcnow() - timedelta(days=30)
+        since = datetime.now(timezone.utc) - timedelta(days=30)
         daily_reports = self.db.get_reports_since(since, report_type="daily")
         if daily_reports:
             report_data = self.report_gen.generate_monthly(
